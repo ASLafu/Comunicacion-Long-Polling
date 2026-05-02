@@ -1,0 +1,39 @@
+INSTRUCCIONES PARA EJECUTAR Y VER LA APLICACION
+Proyecto: ComunicacionLongpollingAnaSara
+
+REQUISITOS
+- Tener Node.js instalado.
+- Estar en Windows.
+
+OPCION 1 (RECOMENDADA): TODO AUTOMATICO
+1) Abre la carpeta del proyecto:
+   C:\CIS2026\ComunicacionLongpollingAnaSara
+2) Haz doble clic en:
+   ejecutar_benchmark.bat
+3) Este script:
+   - Arranca el servidor si no esta iniciado.
+   - Abre el navegador en http://localhost:4001
+   - Ejecuta el benchmark de 10.000 peticiones.
+4) En el navegador veras la interfaz del benchmark (estetica HAL 9000).
+
+OPCION 2: MANUAL (PASO A PASO)
+1) Abre una terminal en la carpeta del proyecto.
+2) Si es la primera vez, instala dependencias:
+   npm install
+3) Arranca el servidor:
+   node servidor.js
+4) Abre el navegador en:
+   http://localhost:4001
+5) En otra terminal, ejecuta el benchmark:
+   node benchmark.js
+
+COMPROBACION RAPIDA
+- Si todo va bien, en consola apareceran resultados con:
+  Total enviados: 10.000
+  Errores: 0 (o muy bajos)
+
+SI HAY PROBLEMAS
+- Error de conexion: verifica que servidor.js este corriendo.
+- Pagina no carga: abre exactamente http://localhost:4001
+  (no abras index.html con doble clic desde el explorador).
+- Puerto ocupado: cierra procesos Node abiertos y vuelve a ejecutar.

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Long Polling Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; }
+    input { width: 60%; padding: 8px; }
+    button { padding: 8px 12px; }
+    li { margin-bottom: 8px; }
+    .box { border: 1px solid #ccc; padding: 16px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Demo de Long Polling</h1>
+  <p>Este cliente mantiene una petición abierta hasta que haya datos o expire el timeout.</p>
+
+  <input id="texto" type="text" placeholder="Escribe un mensaje" />
+  <button onclick="enviarMensaje()">Enviar</button>
+
+  <div class="box">
+    <strong>Mensajes recibidos:</strong>
+    <ul id="lista"></ul>
+  </div>
+
+  <script>
+    async function escuchar() {
+      try {
+        const res = await fetch('/poll');
+        const data = await res.json();
+
+        if (data.mensajes && data.mensajes.length > 0) {
+          const lista = document.getElementById('lista');
+          data.mensajes.forEach(msg => {
+            const li = document.createElement('li');
+            li.textContent = `[${msg.fecha}] ${msg.texto}`;
+            lista.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error('Error en long polling:', error);
+      } finally {
+        escuchar();
+      }
+    }
+
+    async function enviarMensaje() {
+      const input = document.getElementById('texto');
+      const texto = input.value.trim();
+      if (!texto) return;
+
+      await fetch('/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto })
+      });
+
+      input.value = '';
+    }
+
+    escuchar();
+  </script>
+</body>
+</html>

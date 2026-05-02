@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Polling Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .options {
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+        }
+        a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .btn-long-polling {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .btn-long-polling:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-normal-polling {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .btn-normal-polling:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Long Polling Demo</h1>
+        <div class="options">
+            <a href="client-long-polling.html" class="btn-long-polling">
+                ⏱️ Long Polling (Esperar hasta 30s)
+            </a>
+            <a href="client-polling-normal.html" class="btn-normal-polling">
+                📊 Polling Normal (Respuesta inmediata)
+            </a>
+        </div>
+        <div class="info">
+            <p><strong>Long Polling:</strong> El servidor mantiene la conexión abierta hasta 30 segundos esperando mensajes.</p>
+            <p><strong>Polling Normal:</strong> El cliente pregunta al servidor regularmente si hay mensajes nuevos.</p>
+        </div>
+    </div>
+</body>
+</html>

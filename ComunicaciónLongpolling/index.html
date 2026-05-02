@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAL 9000 — MISIÓN: 10.000 TRANSMISIONES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --hal-red:    #cc0000;
+      --hal-red-glow: #ff2200;
+      --hal-amber:  #ff6600;
+      --void:       #000000;
+      --deep:       #050505;
+      --panel:      #0a0a0a;
+      --panel-edge: #1a1a1a;
+      --text-main:  #e8e8e8;
+      --text-dim:   #666666;
+      --text-mono:  #00cc44;
+      --radius:     4px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── ESTRELLAS ─────────────────────────────────────────── */
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: var(--void);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #stars-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ────────────────────────────────────────────── */
+    .header {
+      position: relative; z-index: 10;
+      background: rgba(0,0,0,0.85);
+      border-bottom: 1px solid #1a0000;
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; gap: 1.4rem;
+    }
+
+    /* Ojo de HAL 9000 */
+    .hal-eye {
+      flex-shrink: 0;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 38%,
+        #ff6633 0%,
+        #cc0000 35%,
+        #880000 65%,
+        #1a0000 100%
+      );
+      box-shadow:
+        0 0 12px 4px rgba(204,0,0,0.9),
+        0 0 30px 10px rgba(204,0,0,0.45),
+        0 0 60px 20px rgba(204,0,0,0.2),
+        inset 0 0 8px rgba(255,100,50,0.5);
+      animation: hal-pulse 3s ease-in-out infinite;
+      position: relative;
+    }
+    .hal-eye::after {
+      content: '';
+      position: absolute;
+      top: 18%; left: 22%;
+      width: 22%; height: 22%;
+      border-radius: 50%;
+      background: rgba(255,200,150,0.55);
+      filter: blur(2px);
+    }
+
+    @keyframes hal-pulse {
+      0%, 100% { box-shadow: 0 0 12px 4px rgba(204,0,0,0.9), 0 0 30px 10px rgba(204,0,0,0.45), 0 0 60px 20px rgba(204,0,0,0.2), inset 0 0 8px rgba(255,100,50,0.5); }
+      50%       { box-shadow: 0 0 18px 7px rgba(204,0,0,1),   0 0 50px 18px rgba(204,0,0,0.6),  0 0 90px 35px rgba(204,0,0,0.3), inset 0 0 12px rgba(255,120,60,0.7); }
+    }
+
+    .header-text h1 {
+      font-size: 1rem; font-weight: 700; letter-spacing: 0.18em;
+      color: var(--text-main);
+      text-shadow: 0 0 8px rgba(255,255,255,0.3);
+    }
+    .header-text .sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; color: var(--hal-red);
+      letter-spacing: 0.12em; margin-top: 0.25rem;
+      text-shadow: 0 0 6px rgba(204,0,0,0.7);
+    }
+
+    .status-badge {
+      margin-left: auto;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.14em;
+      color: var(--text-mono);
+      border: 1px solid #004422;
+      padding: 0.3rem 0.8rem;
+      background: rgba(0,30,15,0.6);
+      text-shadow: 0 0 6px rgba(0,200,60,0.6);
+    }
+
+    /* ── LAYOUT ────────────────────────────────────────────── */
+    .container {
+      position: relative; z-index: 10;
+      max-width: 680px; margin: 2rem auto; padding: 0 1rem 3rem;
+    }
+
+    /* ── PANEL (tarjeta) ───────────────────────────────────── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-edge);
+      border-top: 2px solid var(--hal-red);
+      margin-bottom: 1.4rem;
+      position: relative;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--hal-red), transparent);
+    }
+
+    .panel-header {
+      padding: 0.8rem 1.4rem;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.2em; color: var(--hal-red);
+      border-bottom: 1px solid #1a0000;
+      display: flex; align-items: center; gap: 0.7rem;
+      text-shadow: 0 0 8px rgba(204,0,0,0.6);
+    }
+    .panel-header .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--hal-red);
+      box-shadow: 0 0 6px rgba(204,0,0,0.8);
+      animation: blink 2s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .panel-body {
+      padding: 1.6rem 1.4rem;
+      text-align: center;
+    }
+
+    .hal-quote {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; color: var(--text-dim);
+      line-height: 1.7; margin-bottom: 1.4rem;
+      border-left: 2px solid #1a0000;
+      padding-left: 0.9rem;
+      text-align: left;
+    }
+    .hal-quote em {
+      color: #888; font-style: normal;
+    }
+    .hal-quote strong {
+      color: var(--text-main);
+      font-weight: 400;
+    }
+
+    /* ── BOTÓN ─────────────────────────────────────────────── */
+    .btn-run {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.2em;
+      padding: 0.85rem 2.5rem;
+      background: transparent;
+      color: var(--hal-red);
+      border: 1px solid var(--hal-red);
+      cursor: pointer;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.25s, background 0.25s, box-shadow 0.25s;
+      text-shadow: 0 0 8px rgba(204,0,0,0.6);
+      box-shadow: 0 0 10px rgba(204,0,0,0.2), inset 0 0 10px rgba(204,0,0,0.05);
+    }
+    .btn-run:hover:not(:disabled) {
+      background: rgba(204,0,0,0.12);
+      box-shadow: 0 0 20px rgba(204,0,0,0.5), inset 0 0 20px rgba(204,0,0,0.1);
+      color: #ff4444;
+    }
+    .btn-run:active:not(:disabled) { transform: scale(0.98); }
+    .btn-run:disabled {
+      color: #440000; border-color: #330000;
+      cursor: not-allowed; box-shadow: none; text-shadow: none;
+    }
+
+    /* ── BARRA DE PROGRESO ─────────────────────────────────── */
+    .progress-wrap {
+      margin: 1.6rem 0 1rem;
+      display: none;
+    }
+    .progress-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; color: var(--text-dim);
+      letter-spacing: 0.1em; margin-bottom: 0.4rem;
+      text-align: left;
+    }
+    .progress-bar-bg {
+      width: 100%; height: 20px;
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      position: relative; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #660000, #cc0000, #ff2200);
+      transition: width 0.12s;
+      box-shadow: 0 0 12px rgba(204,0,0,0.6);
+      position: relative;
+    }
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute; right: 0; top: 0; bottom: 0; width: 3px;
+      background: #ff6644;
+      box-shadow: 0 0 8px #ff4422;
+    }
+    .progress-text {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+      color: #ffcccc;
+      text-shadow: 0 0 4px rgba(255,0,0,0.8);
+      mix-blend-mode: difference;
+    }
+
+    /* ── RESULTADOS ────────────────────────────────────────── */
+    .results { display: none; margin-top: 1.4rem; }
+    .results-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .stat-card {
+      background: #050505;
+      border: 1px solid #1a0000;
+      border-top: 1px solid #330000;
+      padding: 1rem;
+      text-align: left;
+    }
+    .stat-card .value {
+      font-size: 1.55rem; font-weight: 700;
+      color: var(--hal-red);
+      text-shadow: 0 0 10px rgba(204,0,0,0.7);
+      letter-spacing: 0.05em;
+    }
+    .stat-card .label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.62rem; color: var(--text-dim);
+      letter-spacing: 0.12em; margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    /* ── EXPLICACIÓN ───────────────────────────────────────── */
+    .explain-inner {
+      padding: 1.2rem 1.4rem;
+    }
+    .explain-inner h3 {
+      font-size: 0.68rem; letter-spacing: 0.2em;
+      color: var(--hal-red); margin-bottom: 0.8rem;
+      text-shadow: 0 0 6px rgba(204,0,0,0.5);
+    }
+    .explain-inner ol {
+      padding-left: 1.2rem;
+      counter-reset: mission-counter;
+      list-style: none;
+    }
+    .explain-inner li {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem; color: #999;
+      margin-bottom: 0.5rem; line-height: 1.5;
+      position: relative; padding-left: 1.4rem;
+    }
+    .explain-inner li::before {
+      content: '> ';
+      position: absolute; left: 0;
+      color: var(--hal-red);
+    }
+
+    /* ── LOG ───────────────────────────────────────────────── */
+    .log-wrap { }
+    .log-toggle {
+      width: 100%; text-align: left;
+      padding: 0.7rem 1.4rem;
+      background: transparent;
+      border: none; border-bottom: 1px solid #0d0d0d;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.14em;
+      color: var(--text-dim); cursor: pointer;
+      text-transform: uppercase;
+    }
+    .log-toggle:hover { color: #aaa; }
+    .log-content {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .log-content.open { max-height: 200px; overflow-y: auto; }
+    .log-inner {
+      padding: 0.8rem 1.4rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem; color: var(--text-mono);
+      line-height: 1.6;
+    }
+    .log-inner .entry { margin-bottom: 0.15rem; }
+    .log-inner .entry .ts { color: #006622; }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .footer-quote {
+      text-align: center; margin-top: 2.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: #333;
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+    }
+    .footer-quote span { color: #550000; }
+
+    /* ── ALERTA ERROR ──────────────────────────────────────── */
+    .hal-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.9rem 1.2rem;
+      border: 1px solid #660000;
+      background: rgba(80,0,0,0.35);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem; color: #ff6666;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .hal-error strong { color: #ff2222; letter-spacing: 0.08em; }
+
+    /* ── SCAN LINE EFFECT ──────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Campo de estrellas -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- CABECERA -->
+  <div class="header">
+    <div class="hal-eye"></div>
+    <div class="header-text">
+      <h1>DISCOVERY ONE — SISTEMA DE COMUNICACIONES</h1>
+      <div class="sub">HAL 9000 · UNIDAD DE PROCESO · MISION: BENCHMARK 10.000 TRANSMISIONES</div>
+    </div>
+    <div class="status-badge">OPERACIONAL</div>
+  </div>
+
+  <div class="container">
+
+    <!-- PANEL PRINCIPAL -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="dot"></span>
+        SUBSISTEMA DE TRANSMISIÓN — LONG POLLING
+      </div>
+      <div class="panel-body">
+
+        <div class="hal-quote">
+          <em>HAL:</em> <strong>«Estoy completamente operativo y todos mis circuitos funcionan perfectamente.»</strong><br><br>
+          Este módulo envía <strong>10.000 mensajes POST</strong> al servidor Long Polling y mide
+          el rendimiento del canal de comunicación: tiempo total, tasa de transmisión
+          y latencia media por paquete.
+        </div>
+
+        <button class="btn-run" id="btnRun" onclick="runBenchmark()">
+          &#9632;&nbsp; INICIAR MISIÓN
+        </button>
+
+        <div class="hal-error" id="halError">
+          <strong>⚠ ERROR DE TRANSMISIÓN — HAL 9000</strong><br>
+          No se puede conectar con el servidor en <span id="errorBase"></span><br><br>
+          Solución: abre esta página desde el servidor, no desde el explorador de archivos.<br>
+          Ejecuta primero <strong>iniciar_servidor.bat</strong> y luego abre:<br>
+          <strong>http://localhost:4001</strong>
+        </div>
+
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-label">TRANSMITIENDO PAQUETES —</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill"></div>
+            <div class="progress-text" id="progressText">0%</div>
+          </div>
+        </div>
+
+        <div class="results" id="results">
+          <div class="results-grid">
+            <div class="stat-card">
+              <div class="value" id="statTotal">—</div>
+              <div class="label">PAQUETES ENVIADOS</div>
+            </div>
+            <div class="stat-card">
+              <div class="value" id="statErrores">—</div>
+              <div class="label">ERRORES DE TRANSMISIÓN</div>
+            </div>
+            <div class="stat-card">
+              <div class="value" id="statTiempo">—</div>
+              <div class="label">TIEMPO DE MISIÓN</div>
+            </div>
+            <div class="stat-card">
+              <div class="value" id="statVelocidad">—</div>
+              <div class="label">PAQUETES / SEGUNDO</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL PROTOCOLO -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="dot"></span>
+        PROTOCOLO DE MISIÓN
+      </div>
+      <div class="explain-inner">
+        <h3>SECUENCIA DE OPERACIONES — HAL 9000</h3>
+        <ol>
+          <li>Cada transmisión POST envía un paquete de datos al servidor</li>
+          <li>El servidor almacena el paquete y notifica a los clientes Long Polling en espera</li>
+          <li>Las transmisiones se agrupan en lotes de 100 paquetes simultáneos</li>
+          <li>Al finalizar la misión se presentan los datos de rendimiento del canal</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- PANEL LOG -->
+    <div class="panel">
+      <div class="log-wrap">
+        <button class="log-toggle" onclick="toggleLog(this)">
+          ▶ REGISTRO DE TRANSMISIONES (HAL 9000)
+        </button>
+        <div class="log-content" id="logBox">
+          <div class="log-inner" id="logContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-quote">
+      <span>2001: A Space Odyssey</span> · Stanley Kubrick · 1968<br>
+      «Buenas tardes, señores. Soy el ordenador HAL 9000.»
+    </div>
+
+  </div><!-- /container -->
+
+<script>
+  /* ── Campo de estrellas ─────────────────────────────────── */
+  (function initStars() {
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    function createStars(n) {
+      stars = [];
+      for (let i = 0; i < n; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.2 + 0.2,
+          a: Math.random(),
+          speed: Math.random() * 0.004 + 0.001,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const t = Date.now() / 1000;
+      for (const s of stars) {
+        const alpha = s.a * 0.5 + 0.5 * Math.sin(t * s.speed * 60 + s.phase) * s.a;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${Math.max(0, Math.min(1, alpha))})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    resize();
+    createStars(280);
+    draw();
+    window.addEventListener('resize', () => { resize(); createStars(280); });
+  })();
+
+  /* ── Benchmark ──────────────────────────────────────────── */
+  const BASE  = (window.location.origin && window.location.origin !== 'null')
+                ? window.location.origin : 'http://localhost:4001';
+  const TOTAL = 10000;
+  const LOTE  = 100;
+
+  function log(msg) {
+    const el  = document.getElementById('logContent');
+    const ts  = new Date().toLocaleTimeString();
+    const div = document.createElement('div');
+    div.className = 'entry';
+    div.innerHTML = `<span class="ts">[${ts}]</span> ${msg}`;
+    el.appendChild(div);
+    el.parentElement.scrollTop = el.parentElement.scrollHeight;
+  }
+
+  function toggleLog(btn) {
+    const box = document.getElementById('logBox');
+    const open = box.classList.toggle('open');
+    btn.textContent = (open ? '▼' : '▶') + ' REGISTRO DE TRANSMISIONES (HAL 9000)';
+  }
+
+  function updateProgress(done) {
+    const pct = Math.min(100, Math.round((done / TOTAL) * 100));
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent =
+      `${pct}% — ${done.toLocaleString()} / ${TOTAL.toLocaleString()} PAQUETES`;
+  }
+
+  async function postMensaje(i) {
+    const res = await fetch(BASE + '/mensaje', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: `Paquete #${i}` }),
+    });
+    return res.json();
+  }
+
+  async function runBenchmark() {
+    const btn = document.getElementById('btnRun');
+    btn.disabled = true;
+    btn.textContent = '◉  TRANSMITIENDO…';
+
+    document.getElementById('progressWrap').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('halError').style.display = 'none';
+    document.getElementById('logContent').innerHTML = '';
+    document.getElementById('logBox').classList.add('open');
+    document.querySelector('.log-toggle').textContent =
+      '▼ REGISTRO DE TRANSMISIONES (HAL 9000)';
+
+    // Verificar conexión con el servidor
+    try {
+      await fetch(BASE + '/reset', { method: 'POST' });
+    } catch (e) {
+      document.getElementById('errorBase').textContent = BASE;
+      document.getElementById('halError').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '▶  REINTENTAR MISIÓN';
+      return;
+    }
+    log('Sistema reseteado. HAL 9000 iniciando transmisión…');
+
+    let completados = 0, errores = 0;
+    const inicio = performance.now();
+
+    for (let lote = 0; lote < TOTAL; lote += LOTE) {
+      const promesas = [];
+      for (let i = lote; i < lote + LOTE && i < TOTAL; i++) {
+        promesas.push(
+          postMensaje(i + 1)
+            .then(() => { completados++; })
+            .catch(() => { errores++; })
+        );
+      }
+      await Promise.all(promesas);
+      updateProgress(completados + errores);
+
+      if ((lote + LOTE) % 1000 === 0) {
+        log(`${completados.toLocaleString()} paquetes transmitidos. Canal estable.`);
+      }
+    }
+
+    const fin = performance.now();
+    const duracion    = (fin - inicio) / 1000;
+    const porSegundo  = Math.round(completados / duracion);
+    const mediaPkt    = ((fin - inicio) / Math.max(completados,1)).toFixed(2);
+
+    document.getElementById('statTotal').textContent    = completados.toLocaleString();
+    document.getElementById('statErrores').textContent  = errores;
+    document.getElementById('statTiempo').textContent   = duracion.toFixed(2) + ' s';
+    document.getElementById('statVelocidad').textContent = porSegundo.toLocaleString();
+    document.getElementById('results').style.display = 'block';
+
+    log(`MISIÓN COMPLETADA — ${completados.toLocaleString()} paquetes en ${duracion.toFixed(2)} s (${porSegundo} pkt/s) — Latencia media: ${mediaPkt} ms`);
+
+    btn.disabled = false;
+    btn.textContent = '▶  REPETIR MISIÓN';
+  }
+</script>
+</body>
+</html>
